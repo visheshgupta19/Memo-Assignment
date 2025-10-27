@@ -7681,17 +7681,44 @@ This step bridges raw financial data with operational guidance allowing sales in
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="Explanation-of-the-Transformation">Explanation of the Transformation<a class="anchor-link" href="#Explanation-of-the-Transformation">¶</a></h3><p>The staffing calculation proceeds in five key steps:</p>
 <ol>
-<li><p><strong><code>hour_sales</code></strong> — represents total hourly revenue, e.g.:</p>
-<p>| hour_of_day | money ($) |
-|--------------|-----------|
-| 6 | 120 |
-| 7 | 250 |
-| 8 | 430 |
-| 9 | 670 |
-| 10 | 620 |
-| 11 | 540 |</p>
+<li><strong><code>hour_sales</code></strong> — represents total hourly revenue, e.g.:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">hour_of_day</th>
+<th style="text-align:right">money ($)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:right">120</td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:right">250</td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:right">430</td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:right">670</td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:right">620</td>
+</tr>
+<tr>
+<td style="text-align:center">11</td>
+<td style="text-align:right">540</td>
+</tr>
+</tbody>
+</table>
 <p>Here, 9–10 AM is clearly the high-demand period.</p>
-</li>
+<ol start="2">
 <li><p><strong>Normalization:</strong><br/>
 Dividing by <code>hour_sales.max()</code> scales all hourly sales to a 0–1 range:<br/>
 $[
