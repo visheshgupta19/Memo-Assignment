@@ -7528,7 +7528,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="1.-Dataset-Overview-and-Cleaning">1. Dataset Overview and Cleaning<a class="anchor-link" href="#1.-Dataset-Overview-and-Cleaning">¶</a></h2><p>The dataset <code>Coffee_sales.csv</code> consists of <strong>3,547 transactional records</strong> with columns such as:</p>
+<h2 id="1.-Dataset-Overview-and-Cleaning">1. Dataset Overview and Cleaning<a class="anchor-link" href="#1.-Dataset-Overview-and-Cleaning">¶</a></h2><p>The dataset <code>Coffe_sales_with_menu_price</code> consists of <strong>3,547 transactional records</strong> with columns such as:</p>
 <ul>
 <li><code>money</code>: revenue per transaction (numeric, continuous)</li>
 <li><code>hour_of_day</code>: 24-hour timestamp of purchase</li>
@@ -7552,8 +7552,8 @@ Outliers (very high single-transaction amounts) were retained since they likely 
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="2.-Feature-Engineering">2. Feature Engineering<a class="anchor-link" href="#2.-Feature-Engineering">¶</a></h2><p>Two key engineered features were created:</p>
 <ul>
-<li><strong>Time_of_Day</strong> — derived from <code>hour_of_day</code> to represent broad customer behavior periods (Morning, Afternoon, Evening).</li>
-<li><strong>Weekdaysort</strong> — assigns numeric order to weekdays for consistent plotting.</li>
+<li><strong>Time_of_Day</strong> derived from <code>hour_of_day</code> to represent broad customer behavior periods (Morning, Afternoon, Evening).</li>
+<li><strong>Weekdaysort</strong> assigns numeric order to weekdays for consistent plotting.</li>
 </ul>
 <p>The cutoffs for <code>Time_of_Day</code> were defined as:</p>
 <ul>
@@ -7647,26 +7647,156 @@ Each aggregation corresponds to a managerial insight discussed in the memo:</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="4.-Post-Processing-and-Derived-Metrics">4. Post-Processing and Derived Metrics<a class="anchor-link" href="#4.-Post-Processing-and-Derived-Metrics">¶</a></h2><h3 id="4.1-Normalization-and-Staffing-Function">4.1 Normalization and Staffing Function<a class="anchor-link" href="#4.1-Normalization-and-Staffing-Function">¶</a></h3><p>A normalization and ceiling function was applied to translate sales intensity into a <strong>recommended staffing level per hour</strong>.</p>
+<h2 id="4.-Post-Processing-and-Derived-Metrics">4. Post-Processing and Derived Metrics<a class="anchor-link" href="#4.-Post-Processing-and-Derived-Metrics">¶</a></h2><h3 id="4.1-Normalization-and-Staffing-Function">4.1 Normalization and Staffing Function<a class="anchor-link" href="#4.1-Normalization-and-Staffing-Function">¶</a></h3><p>After calculating total sales per hour (<code>sales_by_hour</code>), a heuristic staffing model was applied to convert hourly revenue into a recommended number of staff members.<br/>
+This step bridges raw financial data with operational guidance allowing sales intensity to be interpreted as workload intensity.</p>
 <div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="c1"># Extract hourly sales as a Series indexed by hour</span>
 <span class="n">hour_sales</span> <span class="o">=</span> <span class="n">sales_by_hour</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"hour_of_day"</span><span class="p">)[</span><span class="s2">"money"</span><span class="p">]</span>
+
+<span class="c1"># Normalize hourly sales between 0 and 1</span>
 <span class="n">normalized</span> <span class="o">=</span> <span class="n">hour_sales</span> <span class="o">/</span> <span class="n">hour_sales</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+<span class="c1"># Scale and convert normalized values into discrete staff counts</span>
 <span class="n">recommended_staff</span> <span class="o">=</span> <span class="p">(</span><span class="n">normalized</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="c1"># Create final DataFrame with hour and staff recommendations</span>
+<span class="n">rec_hours</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">"hour_of_day"</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">24</span><span class="p">)})</span>
+    <span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">recommended_staff</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">"recommended_staff"</span><span class="p">),</span> <span class="n">on</span><span class="o">=</span><span class="s2">"hour_of_day"</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">rec_hours</span><span class="p">[</span><span class="s2">"recommended_staff"</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec_hours</span><span class="p">[</span><span class="s2">"recommended_staff"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">rec_hours</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
-<p>Explanation:</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dac2e36a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Explanation-of-the-Transformation">Explanation of the Transformation<a class="anchor-link" href="#Explanation-of-the-Transformation">¶</a></h3><p>The staffing calculation proceeds in five key steps:</p>
+<ol>
+<li><p><strong><code>hour_sales</code></strong> — represents total hourly revenue, e.g.:</p>
+<p>| hour_of_day | money ($) |
+|--------------|-----------|
+| 6 | 120 |
+| 7 | 250 |
+| 8 | 430 |
+| 9 | 670 |
+| 10 | 620 |
+| 11 | 540 |</p>
+<p>Here, 9–10 AM is clearly the high-demand period.</p>
+</li>
+<li><p><strong>Normalization:</strong><br/>
+Dividing by <code>hour_sales.max()</code> scales all hourly sales to a 0–1 range:<br/>
+$[
+\text{normalized}_i = \frac{\text{sales}_i}{\text{max(sales)}}
+]$<br/>
+For example, if 9 AM = $670 and 6 AM = $120, then:
+$[
+\text{normalized}(6 \text{AM}) = 120 / 670 ≈ 0.18
+]$
+This allows comparison of relative sales intensity across hours.</p>
+</li>
+<li><p><strong>Scaling:</strong><br/>
+Multiplying by 5 maps the normalized sales into a theoretical range of 0–5.<br/>
+This constant (5) represents the <strong>maximum number of employees needed during peak demand</strong> for a small- to mid-sized coffee shop.<br/>
+It’s a tunable parameter that can be adapted for larger stores.</p>
+</li>
+<li><p><strong>Ceiling Function (<code>math.ceil()</code>):</strong><br/>
+Rounds each scaled value <strong>up</strong> to the nearest integer, ensuring that fractional workloads are represented by whole staff members.<br/>
+For example:</p>
 <ul>
-<li><p>The variable <code>hour_sales</code> gives absolute sales by hour.</p>
-</li>
-<li><p>Dividing by <code>hour_sales.max()</code> scales all values between 0–1 (min–max normalization).</p>
-</li>
-<li><p>Multiplying by 5 scales the range to 0–5, roughly reflecting relative labor intensity for a small café (where 5 employees represent peak coverage).</p>
-</li>
-<li><p>Applying <code>math.ceil()</code> ensures discrete staff counts (no fractions).</p>
-</li>
-<li><p>Adding +1 ensures a minimum staffing baseline even during off-peak hours.</p>
-</li>
+<li>9 AM (normalized 1.00 × 5 = 5.00 → ceil = 5)</li>
+<li>6 AM (normalized 0.18 × 5 = 0.9 → ceil = 1)</li>
 </ul>
-<p>This heuristic-based transformation mirrors real-world scheduling logic: sales intensity correlates with labor need, but always requires minimum coverage for operations and safety.</p>
+</li>
+<li><p><strong>Baseline Adjustment (+1):</strong><br/>
+Adds a <strong>minimum coverage of one staff member</strong>, ensuring that even during very low traffic hours (late evenings or early mornings), at least one barista is on duty for safety and customer service.</p>
+</li>
+</ol>
+<p>The final function therefore transforms revenue into operationally interpretable staff counts:</p>
+<p>$[
+\text{Recommended Staff}_i = \lceil (\text{Sales}_i / \text{Max Sales}) \times 5 \rceil + 1
+]$</p>
+<p>This is a <strong>nonlinear heuristic</strong>, meaning small increases in sales at lower hours may not proportionally increase staffing, but high-volume hours rapidly reach peak staffing levels.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=308e240e">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Example</strong>: Inspect calculated recommendations for peak and off-peak hours</p>
+<div class="highlight"><pre><span></span><span class="n">rec_hours</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rec_hours</span><span class="p">[</span><span class="s2">"hour_of_day"</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">20</span><span class="p">])]</span>
+</pre></div>
+<h3 id="Example-Interpretation">Example Interpretation<a class="anchor-link" href="#Example-Interpretation">¶</a></h3><table>
+<thead>
+<tr>
+<th>Hour</th>
+<th>Sales ($)</th>
+<th>Normalized</th>
+<th>Scaled</th>
+<th>Ceil</th>
+<th>+1</th>
+<th>Recommended Staff</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6 AM</td>
+<td>120</td>
+<td>0.18</td>
+<td>0.9</td>
+<td>1</td>
+<td>+1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>9 AM</td>
+<td>670</td>
+<td>1.00</td>
+<td>5.0</td>
+<td>5</td>
+<td>+1</td>
+<td>6</td>
+</tr>
+<tr>
+<td>2 PM</td>
+<td>350</td>
+<td>0.52</td>
+<td>2.6</td>
+<td>3</td>
+<td>+1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>8 PM</td>
+<td>190</td>
+<td>0.28</td>
+<td>1.4</td>
+<td>2</td>
+<td>+1</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>Hence, the model recommends <strong>6 staff members at peak (9 AM)</strong> and <strong>2–3 during slower hours (6 AM, 8 PM)</strong> consistent with observed transaction volume patterns.</p>
+<h3 id="Analytical-Rationale">Analytical Rationale<a class="anchor-link" href="#Analytical-Rationale">¶</a></h3><ul>
+<li><strong>Normalization:</strong> Enables comparison across stores and days by removing scale bias.</li>
+<li><strong>Scaling factor (×5):</strong> Reflects realistic peak staffing capacity; can be recalibrated for store size or regional norms.</li>
+<li><strong>Ceiling and baseline adjustment:</strong> Prevents fractional staffing and ensures continuous coverage.</li>
+<li><strong>Interpretability:</strong> The resulting staffing chart aligns visually with transaction and revenue peaks, making it actionable for operations teams.</li>
+</ul>
+<p>This transformation is <strong>not a predictive model</strong>, but an <strong>empirical operational heuristic</strong> derived from proportional scaling ideal for translating historical demand patterns into scheduling decisions without requiring regression-based forecasting.</p>
 </div>
 </div>
 </div>
