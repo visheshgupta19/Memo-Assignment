@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Appendix</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>Updated_Appendix</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7516,8 +7516,8 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Appendix:">Appendix:<a class="anchor-link" href="#Appendix:">¶</a></h2><h3 id="Technical-Supporting-Documentation">Technical Supporting Documentation<a class="anchor-link" href="#Technical-Supporting-Documentation">¶</a></h3><p>This section details the complete technical workflow, rationale, and implementation logic behind the visual and analytical components of the memo.</p>
-<p>It documents how the raw data was preprocessed, aggregated, and post-processed for interpretation. Each decision from scaling functions to visualization styling is explained with its analytical justification.</p>
+<h2 id="Appendix">Appendix<a class="anchor-link" href="#Appendix">¶</a></h2><p>This section summarizes the technical workflow behind the memo, outlining how sales data were cleaned, aggregated, and translated into operational insights.</p>
+<p>It highlights the key analytical steps including normalization, scaling, and shift-based staffing logic and explains how each modeling and visualization choice connects directly to practical decisions around scheduling, inventory, and service efficiency.</p>
 </div>
 </div>
 </div>
@@ -7544,131 +7544,84 @@ Outliers (very high single-transaction amounts) were retained since they likely 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cd2033a6">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="2.-Feature-Engineering">2. Feature Engineering<a class="anchor-link" href="#2.-Feature-Engineering">¶</a></h2><p>Two key engineered features were created:</p>
-<ul>
-<li><strong>Time_of_Day</strong> derived from <code>hour_of_day</code> to represent broad customer behavior periods (Morning, Afternoon, Evening).</li>
-<li><strong>Weekdaysort</strong> assigns numeric order to weekdays for consistent plotting.</li>
-</ul>
-<p>The cutoffs for <code>Time_of_Day</code> were defined as:</p>
-<ul>
-<li>Morning: 0 ≤ hour &lt; 11</li>
-<li>Afternoon: 11 ≤ hour &lt; 17</li>
-<li>Evening: 17 ≤ hour &lt; 24</li>
-</ul>
-<p>These bins align with typical coffee consumption and operational patterns (morning commute, midday office breaks, evening social visits).</p>
-<div class="highlight"><pre><span></span><span class="n">day_bins</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">24</span><span class="p">]</span>
-<span class="n">day_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Morning"</span><span class="p">,</span> <span class="s2">"Afternoon"</span><span class="p">,</span> <span class="s2">"Evening"</span><span class="p">]</span>
-<span class="n">df</span><span class="p">[</span><span class="s2">"Time_of_Day"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">"hour_of_day"</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">day_bins</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">day_labels</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="n">weekday_order</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Monday"</span><span class="p">,</span> <span class="s2">"Tuesday"</span><span class="p">,</span> <span class="s2">"Wednesday"</span><span class="p">,</span> <span class="s2">"Thursday"</span><span class="p">,</span> <span class="s2">"Friday"</span><span class="p">,</span> <span class="s2">"Saturday"</span><span class="p">,</span> <span class="s2">"Sunday"</span><span class="p">]</span>
-<span class="n">df</span><span class="p">[</span><span class="s2">"Weekdaysort"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"Weekday"</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">weekday_order</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b07b6e26">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="3.-Aggregation-Logic">3. Aggregation Logic<a class="anchor-link" href="#3.-Aggregation-Logic">¶</a></h2><p>Several aggregation layers were created to support different visual analyses.<br/>
-Each aggregation corresponds to a managerial insight discussed in the memo:</p>
-<table>
-<thead>
-<tr>
-<th>Aggregation</th>
-<th>Purpose</th>
-<th>Analytical Rationale</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>sales_by_hour</code></td>
-<td>Total sales by hour</td>
-<td>Identifies intra-day peaks and operational “rush hours.”</td>
-</tr>
-<tr>
-<td><code>sales_by_weekday</code></td>
-<td>Total sales by day</td>
-<td>Distinguishes weekday vs. weekend trends.</td>
-</tr>
-<tr>
-<td><code>sales_by_coffee</code></td>
-<td>Total sales by product</td>
-<td>Ranks products by contribution to revenue.</td>
-</tr>
-<tr>
-<td><code>pivot_sales</code></td>
-<td>2D pivot (Weekday × Time_of_Day)</td>
-<td>Enables heatmap of sales by time and day.</td>
-</tr>
-<tr>
-<td><code>coffee_heatmap</code></td>
-<td>2D pivot (Coffee Type × Time_of_Day)</td>
-<td>Visualizes product popularity across dayparts.</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5d6d1204">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<div class="highlight"><pre><span></span><span class="n">sales_by_hour</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"hour_of_day"</span><span class="p">,</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">"money"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-<span class="n">sales_by_weekday</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">"Weekday"</span><span class="p">,</span> <span class="s2">"Weekdaysort"</span><span class="p">],</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">"money"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"Weekdaysort"</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">sales_by_coffee</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"coffee_name"</span><span class="p">,</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">"money"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"money"</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">pivot_sales</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s2">"Weekday"</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">"Time_of_Day"</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">"money"</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s2">"sum"</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">coffee_heatmap</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s2">"coffee_name"</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">"Time_of_Day"</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">"money"</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s2">"sum"</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=83d3fd23">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="4.-Post-Processing-and-Derived-Metrics">4. Post-Processing and Derived Metrics<a class="anchor-link" href="#4.-Post-Processing-and-Derived-Metrics">¶</a></h2><h3 id="4.1-Normalization-and-Staffing-Function">4.1 Normalization and Staffing Function<a class="anchor-link" href="#4.1-Normalization-and-Staffing-Function">¶</a></h3><p>After calculating total sales per hour (<code>sales_by_hour</code>), a heuristic staffing model was applied to convert hourly revenue into a recommended number of staff members.<br/>
-This step bridges raw financial data with operational guidance allowing sales intensity to be interpreted as workload intensity.</p>
-<div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<h2 id="2.-Post-Processing-and-Derived-Metrics">2. Post-Processing and Derived Metrics<a class="anchor-link" href="#2.-Post-Processing-and-Derived-Metrics">¶</a></h2><h3 id="2.1-Shift-Based-Normalization-and-Staffing-Heuristic">2.1 Shift-Based Normalization and Staffing Heuristic<a class="anchor-link" href="#2.1-Shift-Based-Normalization-and-Staffing-Heuristic">¶</a></h3><p>After computing total hourly sales (<code>sales_by_hour</code>), transaction data were aggregated into <strong>three operational shift blocks</strong> to reflect realistic staffing windows rather than individual hours:</p>
+<ul>
+<li><strong>Morning (6 AM – 12 PM)</strong> – prep + commuter rush</li>
+<li><strong>Midday (12 PM – 4 PM)</strong> – steady flow + restock</li>
+<li><strong>Evening (4 PM – 10 PM)</strong> – after-work surge + wind-down</li>
+</ul>
+<p>This aggregation bridges sales analytics and workforce planning, converting revenue intensity into actionable staffing guidance for daily scheduling.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Define shift boundaries</span>
+<span class="n">shift_bins</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">22</span><span class="p">]</span>
+<span class="n">shift_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Morning (6AM–12PM)"</span><span class="p">,</span> <span class="s2">"Midday (12PM–4PM)"</span><span class="p">,</span> <span class="s2">"Evening (4PM–10PM)"</span><span class="p">]</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">"Shift"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">"hour_of_day"</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">shift_bins</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">shift_labels</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="c1"># Extract hourly sales as a Series indexed by hour</span>
-<span class="n">hour_sales</span> <span class="o">=</span> <span class="n">sales_by_hour</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"hour_of_day"</span><span class="p">)[</span><span class="s2">"money"</span><span class="p">]</span>
+<span class="c1"># Aggregate total revenue by shift</span>
+<span class="n">sales_by_shift</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"Shift"</span><span class="p">)[</span><span class="s2">"money"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
-<span class="c1"># Normalize hourly sales between 0 and 1</span>
-<span class="n">normalized</span> <span class="o">=</span> <span class="n">hour_sales</span> <span class="o">/</span> <span class="n">hour_sales</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-
-<span class="c1"># Scale and convert normalized values into discrete staff counts</span>
-<span class="n">recommended_staff</span> <span class="o">=</span> <span class="p">(</span><span class="n">normalized</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-
-<span class="c1"># Create final DataFrame with hour and staff recommendations</span>
-<span class="n">rec_hours</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">"hour_of_day"</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">24</span><span class="p">)})</span>
-    <span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">recommended_staff</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">"recommended_staff"</span><span class="p">),</span> <span class="n">on</span><span class="o">=</span><span class="s2">"hour_of_day"</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">rec_hours</span><span class="p">[</span><span class="s2">"recommended_staff"</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec_hours</span><span class="p">[</span><span class="s2">"recommended_staff"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-<span class="n">rec_hours</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="c1"># Normalize and convert to recommended staff counts</span>
+<span class="n">sales_by_shift</span><span class="p">[</span><span class="s2">"normalized"</span><span class="p">]</span> <span class="o">=</span> <span class="n">sales_by_shift</span><span class="p">[</span><span class="s2">"money"</span><span class="p">]</span> <span class="o">/</span> <span class="n">sales_by_shift</span><span class="p">[</span><span class="s2">"money"</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">sales_by_shift</span><span class="p">[</span><span class="s2">"recommended_staff"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">sales_by_shift</span><span class="p">[</span><span class="s2">"normalized"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">sales_by_shift</span>
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=87486b1c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Staffing recommendation Plot</strong></p>
+<p><img alt="staffing" src="./staffing.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c234e4ca">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Shift</th>
+<th style="text-align:right">Sales ($)</th>
+<th style="text-align:right">Normalized</th>
+<th style="text-align:right">Recommended Staff</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Morning (6AM–12PM)</td>
+<td style="text-align:right">5300.9</td>
+<td style="text-align:right">0.89</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">Midday (12PM–4PM)</td>
+<td style="text-align:right">4201.8</td>
+<td style="text-align:right">0.70</td>
+<td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">Evening (4PM–10PM)</td>
+<td style="text-align:right">5971.1</td>
+<td style="text-align:right">1.00</td>
+<td style="text-align:right">4</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -7679,79 +7632,23 @@ This step bridges raw financial data with operational guidance allowing sales in
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Explanation-of-the-Transformation">Explanation of the Transformation<a class="anchor-link" href="#Explanation-of-the-Transformation">¶</a></h3><p>The staffing calculation proceeds in five key steps:</p>
-<ol>
-<li><strong><code>hour_sales</code></strong> — represents total hourly revenue, e.g.:</li>
-</ol>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">hour_of_day</th>
-<th style="text-align:right">money ($)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">6</td>
-<td style="text-align:right">120</td>
-</tr>
-<tr>
-<td style="text-align:center">7</td>
-<td style="text-align:right">250</td>
-</tr>
-<tr>
-<td style="text-align:center">8</td>
-<td style="text-align:right">430</td>
-</tr>
-<tr>
-<td style="text-align:center">9</td>
-<td style="text-align:right">670</td>
-</tr>
-<tr>
-<td style="text-align:center">10</td>
-<td style="text-align:right">620</td>
-</tr>
-<tr>
-<td style="text-align:center">11</td>
-<td style="text-align:right">540</td>
-</tr>
-</tbody>
-</table>
-<p>Here, 9–10 AM is clearly the high-demand period.</p>
-<ol start="2">
-<li><p><strong>Normalization:</strong><br/>
-Dividing by <code>hour_sales.max()</code> scales all hourly sales to a 0–1 range:<br/>
-$[
-\text{normalized}_i = \frac{\text{sales}_i}{\text{max(sales)}}
-]$<br/>
-For example, if 9 AM = $670 and 6 AM = $120, then:
-$[
-\text{normalized}(6 \text{AM}) = 120 / 670 ≈ 0.18
-]$
-This allows comparison of relative sales intensity across hours.</p>
-</li>
-<li><p><strong>Scaling:</strong><br/>
-Multiplying by 5 maps the normalized sales into a theoretical range of 0–5.<br/>
-This constant (5) represents the <strong>maximum number of employees needed during peak demand</strong> for a small- to mid-sized coffee shop.<br/>
-It’s a tunable parameter that can be adapted for larger stores.</p>
-</li>
-<li><p><strong>Ceiling Function (<code>math.ceil()</code>):</strong><br/>
-Rounds each scaled value <strong>up</strong> to the nearest integer, ensuring that fractional workloads are represented by whole staff members.<br/>
-For example:</p>
-<ul>
-<li>9 AM (normalized 1.00 × 5 = 5.00 → ceil = 5)</li>
-<li>6 AM (normalized 0.18 × 5 = 0.9 → ceil = 1)</li>
+<h3 id="2.2-Explanation-of-the-Transformation">2.2 Explanation of the Transformation<a class="anchor-link" href="#2.2-Explanation-of-the-Transformation">¶</a></h3><h4 id="Aggregation-by-Shift-Block"><strong>Aggregation by Shift Block</strong><a class="anchor-link" href="#Aggregation-by-Shift-Block">¶</a></h4><p>Summing hourly revenue within the three shift ranges smooths local fluctuations and aligns the analysis with how managers actually schedule staff.</p>
+<h4 id="Normalization"><strong>Normalization</strong><a class="anchor-link" href="#Normalization">¶</a></h4><p>Each shift’s sales are divided by the maximum shift total to scale values from 0–1:</p>
+<p>$$
+\text{normalized}_i = \frac{\text{sales}_i}{\max(\text{sales})}
+$$</p>
+<p>This expresses demand as a <strong>relative intensity measure</strong>, independent of absolute sales levels.</p>
+<h4 id="Scaling-and-Conversion-to-Staff-Counts"><strong>Scaling and Conversion to Staff Counts</strong><a class="anchor-link" href="#Scaling-and-Conversion-to-Staff-Counts">¶</a></h4><p>Multiplying normalized intensity by 3 translates workload into a practical staffing range (up to <strong>3 incremental workers above baseline</strong>).<br/>
+Rounding and adding +1 guarantees a minimum coverage of one barista even in low-traffic periods:</p>
+<p>$$
+\text{Recommended Staff}_i = \text{round}\left( \frac{\text{Sales}_i}{\text{Max Sales}} \times 3 \right) + 1
+$$</p>
+<h4 id="Operational-Interpretation"><strong>Operational Interpretation</strong><a class="anchor-link" href="#Operational-Interpretation">¶</a></h4><ul>
+<li><strong>Morning (4 staff):</strong> High early demand from commuters → max coverage for speed and prep.</li>
+<li><strong>Midday (3 staff):</strong> Moderate traffic → lean crew focused on restock and cleanup.</li>
+<li><strong>Evening (4 staff):</strong> Renewed demand → scale back up for social and after-work orders.</li>
 </ul>
-</li>
-<li><p><strong>Baseline Adjustment (+1):</strong><br/>
-Adds a <strong>minimum coverage of one staff member</strong>, ensuring that even during very low traffic hours (late evenings or early mornings), at least one barista is on duty for safety and customer service.</p>
-</li>
-</ol>
-<p>The final function therefore transforms revenue into operationally interpretable staff counts:</p>
-<p>$[
-\text{Recommended Staff}_i = \lceil (\text{Sales}_i / \text{Max Sales}) \times 5 \rceil + 1
-]$</p>
-<p>This is a <strong>nonlinear heuristic</strong>, meaning small increases in sales at lower hours may not proportionally increase staffing, but high-volume hours rapidly reach peak staffing levels.</p>
+<h4 id="Actionability"><strong>Actionability</strong><a class="anchor-link" href="#Actionability">¶</a></h4><p>The resulting heuristic links financial data directly to shift scheduling without complex forecasting models, giving managers a transparent and data-driven baseline for staffing.</p>
 </div>
 </div>
 </div>
@@ -7762,68 +7659,76 @@ Adds a <strong>minimum coverage of one staff member</strong>, ensuring that even
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><strong>Example</strong>: Inspect calculated recommendations for peak and off-peak hours</p>
-<div class="highlight"><pre><span></span><span class="n">rec_hours</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rec_hours</span><span class="p">[</span><span class="s2">"hour_of_day"</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">20</span><span class="p">])]</span>
+<h3 id="Example-Calculation-and-Interpretation">Example Calculation and Interpretation<a class="anchor-link" href="#Example-Calculation-and-Interpretation">¶</a></h3><p>To confirm the transformation, the following snippet inspects the computed recommendations for each shift:</p>
+<div class="highlight"><pre><span></span><span class="n">sales_by_shift</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sales_by_shift</span><span class="p">[</span><span class="s2">"Shift"</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span>
+    <span class="s2">"Morning (6AM–12PM)"</span><span class="p">,</span> <span class="s2">"Midday (12PM–4PM)"</span><span class="p">,</span> <span class="s2">"Evening (4PM–10PM)"</span>
+<span class="p">])]</span>
 </pre></div>
-<h3 id="Example-Interpretation">Example Interpretation<a class="anchor-link" href="#Example-Interpretation">¶</a></h3><table>
+<table>
 <thead>
 <tr>
-<th>Hour</th>
-<th>Sales ($)</th>
+<th>Shift</th>
+<th>Total Sales ($)</th>
 <th>Normalized</th>
-<th>Scaled</th>
-<th>Ceil</th>
-<th>+1</th>
+<th>Scaled (×3)</th>
+<th>Rounded</th>
+<th>+1 Baseline</th>
 <th>Recommended Staff</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>6 AM</td>
-<td>120</td>
-<td>0.18</td>
-<td>0.9</td>
-<td>1</td>
-<td>+1</td>
-<td>2</td>
-</tr>
-<tr>
-<td>9 AM</td>
-<td>670</td>
-<td>1.00</td>
-<td>5.0</td>
-<td>5</td>
-<td>+1</td>
-<td>6</td>
-</tr>
-<tr>
-<td>2 PM</td>
-<td>350</td>
-<td>0.52</td>
-<td>2.6</td>
+<td>Morning (6AM–12PM)</td>
+<td>5300.9</td>
+<td>0.89</td>
+<td>2.67</td>
 <td>3</td>
 <td>+1</td>
 <td>4</td>
 </tr>
 <tr>
-<td>8 PM</td>
-<td>190</td>
-<td>0.28</td>
-<td>1.4</td>
+<td>Midday (12PM–4PM)</td>
+<td>4201.8</td>
+<td>0.70</td>
+<td>2.10</td>
 <td>2</td>
 <td>+1</td>
 <td>3</td>
 </tr>
+<tr>
+<td>Evening (4PM–10PM)</td>
+<td>5971.1</td>
+<td>1.00</td>
+<td>3.00</td>
+<td>3</td>
+<td>+1</td>
+<td>4</td>
+</tr>
 </tbody>
 </table>
-<p>Hence, the model recommends <strong>6 staff members at peak (9 AM)</strong> and <strong>2–3 during slower hours (6 AM, 8 PM)</strong> consistent with observed transaction volume patterns.</p>
-<h3 id="Analytical-Rationale">Analytical Rationale<a class="anchor-link" href="#Analytical-Rationale">¶</a></h3><ul>
-<li><strong>Normalization:</strong> Enables comparison across stores and days by removing scale bias.</li>
-<li><strong>Scaling factor (×5):</strong> Reflects realistic peak staffing capacity; can be recalibrated for store size or regional norms.</li>
-<li><strong>Ceiling and baseline adjustment:</strong> Prevents fractional staffing and ensures continuous coverage.</li>
-<li><strong>Interpretability:</strong> The resulting staffing chart aligns visually with transaction and revenue peaks, making it actionable for operations teams.</li>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4d2e54b0">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>These results match the staffing chart, demonstrating <strong>balanced coverage</strong>:</p>
+<ul>
+<li><strong>4 staff</strong> during morning and evening peaks to handle rush and sustained sales.</li>
+<li><strong>3 staff</strong> midday for steady operations and reset activities.</li>
 </ul>
-<p>This transformation is <strong>not a predictive model</strong>, but an <strong>empirical operational heuristic</strong> derived from proportional scaling ideal for translating historical demand patterns into scheduling decisions without requiring regression-based forecasting.</p>
+<h3 id="Analytical-Rationale">Analytical Rationale<a class="anchor-link" href="#Analytical-Rationale">¶</a></h3><p><strong>Normalization:</strong><br/>
+Eliminates scale bias and makes demand patterns comparable across days or locations.</p>
+<p><strong>Shift aggregation:</strong><br/>
+Aligns data with human scheduling practices instead of hourly granularity.</p>
+<p><strong>Scaling (+3) and baseline (+1):</strong><br/>
+Provide a realistic, tunable heuristic for typical café staffing capacity.</p>
+<p>This approach is not predictive but an empirical operational heuristic simple enough for daily use yet grounded in quantitative analysis.<br/>
+It turns historical sales data into an <strong>actionable staffing strategy</strong> that balances <strong>labor efficiency</strong> and <strong>customer service quality</strong> throughout the day.</p>
 </div>
 </div>
 </div>
@@ -7834,20 +7739,13 @@ Adds a <strong>minimum coverage of one staff member</strong>, ensuring that even
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="5.-Reproducibility-and-Analytical-Assumptions">5. Reproducibility and Analytical Assumptions<a class="anchor-link" href="#5.-Reproducibility-and-Analytical-Assumptions">¶</a></h2><ul>
-<li><p><strong>Environment:</strong><br/>
-Python 3.10.<br/>
-Libraries: <code>pandas 2.x</code>, <code>numpy 1.26+</code>, <code>matplotlib 3.8+</code>, <code>seaborn 0.13+</code>.</p>
-</li>
+<h2 id="3.-Analytical-Assumptions">3. Analytical Assumptions<a class="anchor-link" href="#3.-Analytical-Assumptions">¶</a></h2><ul>
 <li><p><strong>Assumptions:</strong></p>
 <ol>
 <li>Sales volume correlates linearly with staffing demand (sufficient for aggregate-level scheduling).</li>
 <li>Customer arrival patterns are consistent across stores in the region.</li>
 <li>No external seasonality or promotional data were included; patterns are purely temporal.</li>
 </ol>
-</li>
-<li><p><strong>Reproducibility:</strong><br/>
-Each cell is modular; parameters such as scaling factor (<code>5</code> in the staffing heuristic) or top product filter (<code>K</code> in product analysis) can be modified to test alternative operational scenarios.</p>
 </li>
 </ul>
 </div>
